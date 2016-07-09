@@ -139,6 +139,7 @@ var paypalUsers = [];
 app.post('/api/sendPN',function(req,res) {
   //GET TOKENS HERE
   //Below query finds closest 500 people with same zip and interests
+  var limit = 0;
   var query = User.find({ 'General.zip' : req.body.zip, 'General.interests' : req.body.tyPe,
                           'General.location' : { $near:{$geometry:
     {type:"Point", coordinates:req.body.location} , $maxDistance: 3000 }}  })
@@ -150,9 +151,10 @@ app.post('/api/sendPN',function(req,res) {
       //console.log(users)
       tokens = [];
       paypalUsers = [];
-
+      limit = req.body.limit
+      
       var index, length;
-      for (index = 0, length = users.length; index < length; ++index) {
+      for (index = 0, length = limit; index < length; ++index) {
         //console.log(users[index].General.device_token);
         tokens.push(users[index].General.device_token);
         //console.log(users[index].PayPal)
