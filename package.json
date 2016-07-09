@@ -1,0 +1,22 @@
+{
+  "name": "revaddb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4",
+    "helmet": "^2.1.1",
+    "mongoose": "^4.4.20",
+    "multer": "^1.1.0",
+    "path": "^0.12.7",
+    "paypal-rest-sdk": "^1.6.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
