@@ -141,7 +141,7 @@ app.post('/api/sendPN',function(req,res) {
   //Below query finds closest 500 people with same zip and interests
   var query = User.find({ 'General.zip' : req.body.zip, 'General.interests' : req.body.tyPe,
                           'General.location' : { $near:{$geometry:
-    {type:"Point", coordinates:req.body.location} , $maxDistance: 3000 }}  }).limit(10000)
+    {type:"Point", coordinates:req.body.location} , $maxDistance: 3000 }}  })
   query.exec(function(err,users) {
     if (err) {
       console.log(err)
