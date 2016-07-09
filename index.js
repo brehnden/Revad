@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 paypal.configure({
-  'mode': 'sandbox', //sandbox or live
+  'mode': 'live', //sandbox or live
   'client_id': 'AZaaTDAGYlu-RHCRxMOHN3_ZX4gqXXSokFjPubaP8dvyYVys14ZRnRI82b-dlNwpHcdGFeYbKMwpDrkl',
   'client_secret': 'EFU6p96mpxSCQKMX5mcxqTDj6PUz4u-zVCGm5vx9pJlMlFg9TjGu2nwR7OprezwwenjIqW2zRcN9472I'
 });
