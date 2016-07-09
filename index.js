@@ -161,6 +161,8 @@ app.post('/api/sendPN',function(req,res) {
         paypalUsers.push(users[index].PayPal)
       }
 
+      console.log(tokens);
+
       var options = {
                 cert: path.join('cert.pem'),
                 key:  path.join('key.pem'),
