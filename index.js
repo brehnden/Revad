@@ -93,7 +93,7 @@ app.post('/api/getsavedad', function(req, res) {
 app.post('/api/sendpayment', function(req,res) {
   //paypal pay user here
 
-if (req.body.amount == 10) {
+if (req.body.amount >= 10) {
 
   var sender_batch_id = Math.random().toString(36).substring(9);
 
@@ -106,7 +106,7 @@ if (req.body.amount == 10) {
           {
               "recipient_type": "EMAIL",
               "amount": {
-                  "value": 10.00,
+                  "value": req.body.amount,
                   "currency": "USD"
               },
               "receiver": req.body.email,
