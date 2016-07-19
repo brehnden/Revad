@@ -30,11 +30,20 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-paypal.configure({
-  'mode': 'live', //sandbox or live
-  'client_id': 'AZaaTDAGYlu-RHCRxMOHN3_ZX4gqXXSokFjPubaP8dvyYVys14ZRnRI82b-dlNwpHcdGFeYbKMwpDrkl',
-  'client_secret': 'EFU6p96mpxSCQKMX5mcxqTDj6PUz4u-zVCGm5vx9pJlMlFg9TjGu2nwR7OprezwwenjIqW2zRcN9472I'
-});
+var clientID, clientSecret
+app.post('/api/getpaypalclient', function(req,res) {
+  clientID = req.body.paypalClientID
+  clientSecret = req.body.paypalClientPassword
+  console.log(clientID)
+  console.log(clientSecret)
+  paypal.configure({
+    'mode': 'live', //sandbox or live
+    'client_id': clientID,//req.body.paypalClientID,
+    'client_secret': clientSecret//req.body.paypalClientPassword
+  });
+
+  res.json(req.body.paypalClientID)
+})
 
 //EDIT: add function here that finds all users within a zip code with similar interests,
 //      display the amount of these users to the business owner. Business owner then
