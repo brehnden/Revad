@@ -1,0 +1,5 @@
+#ignore .pem and .p12 files
+cert.p12
+cert.pem
+key.p12
+key.pem
