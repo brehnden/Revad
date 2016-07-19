@@ -19,12 +19,10 @@ var app = express();
 app.use(helmet())
 
 var port = 4000;
-//var port = 27017;
 var db = 'mongodb://localhost/revaddb';
-//var db = '162.243.86.162';
+
 mongoose.connect(db);
 
-//app.use(express.limit('50mb'));
 app.use(bodyParser.json({}));
 app.use(bodyParser.urlencoded({
   extended: true
@@ -37,25 +35,19 @@ app.post('/api/getpaypalclient', function(req,res) {
   console.log(clientID)
   console.log(clientSecret)
   paypal.configure({
-    'mode': 'live', //sandbox or live
-    'client_id': clientID,//req.body.paypalClientID,
-    'client_secret': clientSecret//req.body.paypalClientPassword
+    'mode': 'sandbox', //sandbox or live
+    'client_id': clientID,
+    'client_secret': clientSecret
   });
 
   res.json(req.body.paypalClientID)
 })
 
-//EDIT: add function here that finds all users within a zip code with similar interests,
-//      display the amount of these users to the business owner. Business owner then
-//      decides how many users the ad should be sent to. To pay the users, the total
-//      amount must be split into groups of 500 (for loop?)
-
 app.post('/api/gettotal',function(req,res) {
-  //GET TOKENS HERE
   //Below query finds closest 500 people with same zip and interests
   var query = User.find({ 'General.zip' : req.body.zip, 'General.interests' : req.body.tyPe,
                           'General.location' : {$near:{$geometry:
-    {type:"Point", coordinates:req.body.location}}}  }).limit(10000)
+    {type:"Point", coordinates:req.body.location}}}  }).limit(1000)
   query.exec(function(err,total) {
     if (err) {
       console.log(err)
@@ -78,31 +70,10 @@ app.post('/api/getsavedad', function(req, res) {
   })
 })
 
-//Below gets paypal auth token
-
-/*app.post({
-    uri: "https://api.sandbox.paypal.com/v1/oauth2/token",
-    headers: {
-        "Accept": "application/json",
-        "Accept-Language": "en_US",
-        "content-type": "application/x-www-form-urlencoded"
-    },
-    auth: {
-    'user': 'AZaaTDAGYlu-RHCRxMOHN3_ZX4gqXXSokFjPubaP8dvyYVys14ZRnRI82b-dlNwpHcdGFeYbKMwpDrkl',
-    'pass': 'EFU6p96mpxSCQKMX5mcxqTDj6PUz4u-zVCGm5vx9pJlMlFg9TjGu2nwR7OprezwwenjIqW2zRcN9472I',
-    // 'sendImmediately': false
-  },
-  form: {
-    "grant_type": "client_credentials"
-  }
-}, function(error, response, body) {
-    console.log(body);
-});*/
-
 app.post('/api/sendpayment', function(req,res) {
   //paypal pay user here
 
-if (req.body.amount >= 10) {
+if (req.body.amount >= 0.05/*10*/) {
 
   var sender_batch_id = Math.random().toString(36).substring(9);
 
@@ -143,34 +114,32 @@ if (req.body.amount >= 10) {
 
 var tokens = [];
 var paypalUsers = [];
-//var random = Math.random()
-//app.get('/api/sendPN',getTokens,push);
+
 app.post('/api/sendPN',function(req,res) {
   //GET TOKENS HERE
   //Below query finds closest 500 people with same zip and interests
-  var limit = 0;
+  var limit
   var query = User.find({ 'General.zip' : req.body.zip, 'General.interests' : req.body.tyPe,
                           'General.location' : { $near:{$geometry:
-    {type:"Point", coordinates:req.body.location} , $maxDistance: 3000 }}  })
+    {type:"Point", coordinates:req.body.location} , $maxDistance: 3000 }}  }).limit(10000)
   query.exec(function(err,users) {
     if (err) {
       console.log(err)
-      //res.end();
     } else {
       //console.log(users)
       tokens = [];
       paypalUsers = [];
       limit = req.body.limit
-      
+
       var index, length;
-      for (index = 0, length = limit; index < length; ++index) {
+      for (index = 0, length = limit/*users.length*/; index < length; ++index) {
         //console.log(users[index].General.device_token);
         tokens.push(users[index].General.device_token);
         //console.log(users[index].PayPal)
         paypalUsers.push(users[index].PayPal)
       }
 
-      console.log(tokens);
+      console.log(tokens)
 
       var options = {
                 cert: path.join('cert.pem'),
@@ -238,26 +207,6 @@ app.post('/api/sendPN',function(req,res) {
       console.log('should have sent push')
     }
 
-    /*var sender_batch_id = Math.random().toString(36).substring(9);
-
-    var create_payout_json = {
-      "sender_batch_header": {
-        "sender_batch_id": sender_batch_id,
-        "email_subject": "Payment from Revad"
-      },
-      "items": paypalUsers
-    }
-
-    paypal.payout.create(create_payout_json, function(error, payout) {
-      if (error) {
-        console.log(error.response)
-        throw error;
-      } else {
-        console.log("Create Payout Response");
-        console.log(payout);
-      }
-    })*/
-
   })
 
 })
@@ -266,11 +215,6 @@ app.post('/api/sendPN',function(req,res) {
 app.get('/api/users', function(req, res) {
   console.log('getting all users')
 
-  //var array = [0,1,2,3,4,5,6,7,8,9,10]
-  //var sliced1 = array.slice(0, 3);
-  //var sliced2 = array.slice(14,500);
-  //console.log(sliced1)
-  //console.log(sliced2)
   User.find({})
   .exec(function(err, users) {
     if(err) {
@@ -313,7 +257,6 @@ app.get('/api/savedads', function(req, res) {
 app.post('/api/users', function(req, res) {
   console.log(req.body)
   var newUser = new User();
-  //newUser.General.email = req.body.General.email;
   newUser.General.email = req.body.General.email;
   newUser.General.interests = req.body.General.interests;
   newUser.General.location = req.body.General.location;
